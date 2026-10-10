@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>0 to Shipped — Resume Parser</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📄</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- ===== Background glow ===== -->
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <!-- ===== Nav ===== -->
+  <header class="nav">
+    <div class="nav__inner">
+      <a class="brand" href="#">
+        <span class="brand__mark">0→</span>
+        <span class="brand__text">0 to Shipped<span class="brand__dot">.</span></span>
+      </a>
+      <nav class="nav__links">
+        <a href="#how">How it works</a>
+        <a href="#score">Scoring</a>
+        <a href="#parser" class="nav__cta">Try it free</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- ===== Hero ===== -->
+    <section class="hero">
+      <span class="pill">
+        <span class="pill__dot"></span> Mock demo · runs fully in your browser
+      </span>
+      <h1 class="hero__title">
+        Score your resume<br />
+        <span class="grad">before a recruiter does.</span>
+      </h1>
+      <p class="hero__sub">
+        Drop in your PDF resume and get an instant read on your match score,
+        the skills we found, and the ones that are missing — in seconds, with no sign-up.
+      </p>
+      <div class="hero__actions">
+        <a href="#parser" class="btn btn--primary">Upload my resume</a>
+        <a href="#how" class="btn btn--ghost">See how it works</a>
+      </div>
+      <ul class="hero__meta">
+        <li><strong>1,200+</strong> skills indexed</li>
+        <li><strong>&lt;3s</strong> average parse</li>
+        <li><strong>0</strong> data stored</li>
+      </ul>
+    </section>
+
+    <!-- ===== Parser ===== -->
+    <section id="parser" class="parser">
+      <div class="card card--upload">
+        <div class="card__head">
+          <h2>Upload your resume</h2>
+          <p>PDF only · max 5&nbsp;MB · processed locally</p>
+        </div>
+
+        <label id="dropzone" class="dropzone" for="file-input">
+          <div class="dropzone__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 16V4m0 0L8 8m4-4 4 4" />
+              <path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" />
+            </svg>
+          </div>
+          <p class="dropzone__title">Drop your PDF here</p>
+          <p class="dropzone__hint">or <span class="dropzone__link">browse files</span></p>
+          <input id="file-input" class="sr-only" type="file" accept="application/pdf,.pdf"
+                 aria-label="Choose a PDF resume to analyze" />
+        </label>
+
+        <div id="file-chip" class="file-chip" hidden>
+          <span class="file-chip__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+              <path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2Z" />
+            </svg>
+          </span>
+          <span class="file-chip__body">
+            <span id="file-name" class="file-chip__name">resume.pdf</span>
+            <span id="file-size" class="file-chip__meta">0 KB</span>
+          </span>
+          <button id="file-remove" class="file-chip__x" type="button" aria-label="Remove file">×</button>
+        </div>
+
+        <button id="parse-btn" class="btn btn--primary btn--block" disabled>
+          Analyze resume
+        </button>
+      </div>
+
+      <!-- ===== Results ===== -->
+      <div id="results" class="results" hidden>
+        <!-- Score ring -->
+        <div class="card card--score">
+          <div class="score">
+            <svg class="score__ring" viewBox="0 0 120 120" aria-hidden="true">
+              <circle class="score__track" cx="60" cy="60" r="52" />
+              <circle id="score-arc" class="score__arc" cx="60" cy="60" r="52" />
+            </svg>
+            <div class="score__value">
+              <span id="score-number">0</span><span class="score__of">/100</span>
+            </div>
+          </div>
+          <p id="score-label" class="score__label">Analyzing…</p>
+          <p id="score-caption" class="score__caption">Match against a Senior Frontend Engineer role.</p>
+
+          <dl class="stats">
+            <div class="stat">
+              <dt>Found</dt>
+              <dd id="stat-found">0</dd>
+            </div>
+            <div class="stat">
+              <dt>Missing</dt>
+              <dd id="stat-missing">0</dd>
+            </div>
+            <div class="stat">
+              <dt>Sections</dt>
+              <dd id="stat-sections">0</dd>
+            </div>
+          </dl>
+        </div>
+
+        <!-- Skills -->
+        <div class="card card--skills">
+          <div class="tabs" role="tablist" aria-label="Resume skill breakdown">
+            <button id="tab-btn-present" class="tab is-active" data-tab="present" role="tab"
+                    aria-selected="true" aria-controls="tab-present" tabindex="0">Skills found</button>
+            <button id="tab-btn-missing" class="tab" data-tab="missing" role="tab"
+                    aria-selected="false" aria-controls="tab-missing" tabindex="-1">Skills missing</button>
+          </div>
+
+          <div id="tab-present" class="tab-panel is-active" role="tabpanel"
+               aria-labelledby="tab-btn-present" tabindex="0">
+            <ul id="list-present" class="chips"></ul>
+          </div>
+          <div id="tab-missing" class="tab-panel" role="tabpanel"
+               aria-labelledby="tab-btn-missing" tabindex="0">
+            <ul id="list-missing" class="chips chips--missing"></ul>
+          </div>
+
+          <div class="tips">
+            <h3>Quick wins</h3>
+            <ul id="tips-list"></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== How it works ===== -->
+    <section id="how" class="how">
+      <h2 class="section__title">From <span class="grad">0</span> to shipped in three steps</h2>
+      <div class="steps">
+        <article class="step">
+          <span class="step__num">01</span>
+          <h3>Upload</h3>
+          <p>Drop in any text-based PDF resume. Nothing leaves your device.</p>
+        </article>
+        <article class="step">
+          <span class="step__num">02</span>
+          <h3>Scan</h3>
+          <p>We compare it against the skills that matter for the target role.</p>
+        </article>
+        <article class="step">
+          <span class="step__num">03</span>
+          <h3>Ship it</h3>
+          <p>Fix the gaps we flag, re-upload, and watch your score climb.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- ===== Scoring ===== -->
+    <section id="score" class="scoring">
+      <div class="scoring__grid">
+        <div>
+          <h2 class="section__title">How the score is built</h2>
+          <p class="section__sub">
+            Every resume is weighted across four signals. Fix the lowest one first —
+            it moves the needle the most.
+          </p>
+        </div>
+        <div class="bars">
+          <div class="bar-row">
+            <span class="bar-row__label">Skill coverage</span>
+            <span class="bar"><span class="bar__fill" style="--w: 45%"></span></span>
+            <span class="bar-row__val">45%</span>
+          </div>
+          <div class="bar-row">
+            <span class="bar-row__label">Impact bullets</span>
+            <span class="bar"><span class="bar__fill" style="--w: 25%"></span></span>
+            <span class="bar-row__val">25%</span>
+          </div>
+          <div class="bar-row">
+            <span class="bar-row__label">Structure &amp; sections</span>
+            <span class="bar"><span class="bar__fill" style="--w: 20%"></span></span>
+            <span class="bar-row__val">20%</span>
+          </div>
+          <div class="bar-row">
+            <span class="bar-row__label">Keyword clarity</span>
+            <span class="bar"><span class="bar__fill" style="--w: 10%"></span></span>
+            <span class="bar-row__val">10%</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p><strong>0 to Shipped.</strong> A mock resume parser demo — no PDFs are uploaded or stored.</p>
+    <p class="footer__muted">Built with plain HTML, CSS &amp; JavaScript.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
